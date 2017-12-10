@@ -1,0 +1,57 @@
+/**
+ * White theme for reveal.js. This is the opposite of the 'black' theme.
+ *
+ * By Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../node_modules/reveal.js/css/theme/template/mixins";
+@import "../node_modules/reveal.js/css/theme/template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(../node_modules/reveal.js/lib/font/source-sans-pro/source-sans-pro.css);
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #fff;
+
+$mainColor: #888888;
+$headingColor: #666666	;
+
+$mainFontSize: 36px;
+$mainFont: 'Source Sans Pro', 'Ubuntu', Helvetica, Arial sans-serif;
+$headingFont: 'Ubuntu', Helvetica, Arial sans-serif;
+$headingTextShadow: none;
+$headingLetterSpacing: normal;
+$headingTextTransform: normal;
+$headingFontWeight: 400;
+$linkColor: #ec7404;
+$linkColorHover: lighten( $linkColor, 15% );
+$selectionBackgroundColor: lighten( $linkColor, 25% );
+
+$heading1Size: 2.5em;
+$heading2Size: 1.3em;
+$heading3Size: 1.15em;
+$heading4Size: 1.0em;
+
+
+section {
+	text-align: left;
+}
+
+section > h1, section > h2 {
+	text-align: center;
+}
+
+section.has-dark-background {
+	&, h1, h2, h3, h4, h5, h6 {
+		color: #fff;
+	}
+}
+
+
+// Theme template ------------------------------
+@import "../node_modules/reveal.js/css/theme/template/theme";
+// ---------------------------------------------

@@ -1,0 +1,458 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>passB - a browser addon for pass</title>
+
+    <link rel="stylesheet" href="node_modules/reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="css/mayflower.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="node_modules/reveal.js/lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match(/print-pdf/gi) ? 'node_modules/reveal.js/css/print/pdf.css' : 'node_modules/reveal.js/css/print/paper.css';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section class="center">
+            <h1>passB</h1>
+            <h2>a browser addon for pass</h2>
+        </section>
+        <section>
+            <h2>Agenda</h2>
+            <ul>
+                <li>About</li>
+                <li>Motivation for passB</li>
+                <li>Goals & Technology</li>
+                <li>Implementing a WebExtension &amp; pitfalls</li>
+                <li>How you can contribute</li>
+            </ul>
+        </section>
+        <section>
+            <h2>About</h2>
+            <h3>My name is Lenz Weber / phryneas</h3>
+            <ul>
+                <li>I'm a Developer & DevOp</li>
+                <li>work at <img src="img/mayflower.svg"
+                                  style="height: 1.2em;vertical-align: bottom;margin: 0;border: none;box-shadow: none;">
+                    (we're hiring, talk to me!)
+                </li>
+                <li>personal interest in security</li>
+                <li>always carry at least two crypto tokens/smartcards</li>
+                <li>have around 600 passwords in his password store</li>
+            </ul>
+            <br/>
+            <br/>
+            <p>
+                <small><a href="https://github.com/phryneas">https://github.com/phryneas</a></small>
+                <br/>
+                <small>
+                    mail@lenzw.de<br/>
+                    8331 9323 EF6D 1C7E 8835<br/>
+                    59A1 D8C4 AE56 B76C 94DD
+                </small>
+            </p>
+        </section>
+        <section>
+            <section class="center">
+                <h1>Motivation for passB</h1>
+            </section>
+            <section>
+                <h2>password-store (pass)</h2>
+                <h3>"the standard unix password manager"</h3>
+                <ul>
+                    <li>written in bash</li>
+                    <li>password entries are just encrypted plaintext files in a normal directory structure</li>
+                    <li>each entry is encrypted using <strong>GPG</strong> against one or more keys</li>
+                    <li>keys can be specified on a per-folder basis for collaboration</li>
+                    <li>synchronization using one or more <strong>git</strong> repositories</li>
+                    <li>support for extensions</li>
+                </ul>
+            </section>
+            <section>
+                <h2>password-store (pass)</h2>
+                <h3>usage</h3>
+                <pre><code data-trim class="bash">
+                    zx2c4@laptop ~ $ pass
+                    Password Store
+                    ├── Business
+                    │   ├── some-silly-business-site.com
+                    │   └── another-business-site.net
+                    ├── Email
+                    │   ├── donenfeld.com
+                    │   └── zx2c4.com
+                    └── France
+                    ├── bank
+                    ├── freebox
+                    └── mobilephone
+                        </code></pre>
+                <pre><code data-trim class="bash">
+                    zx2c4@laptop ~ $ pass Email/zx2c4.com
+                    sup3rh4x3rizmynam3
+                        </code></pre>
+                <pre><code data-trim class="bash">
+                    zx2c4@laptop ~ $ pass generate Email/jasondonenfeld.com 15
+                    The generated password to Email/jasondonenfeld.com is:
+                    $(-QF&Q=IN2nFBx
+                        </code></pre>
+            </section>
+            <section>
+                <h2>existing browser plugins:</h2>
+                <h3>passff</h3>
+                <div style="display:flex; justify-content: space-between; width:100%">
+                    <ul>
+                        <li>my choice for years</li>
+                        <li class="fragment">originally written as a XUL-Addon</li>
+                        <li class="fragment">now ported over to a WebExtension</li>
+                        <li class="fragment">still relies on deprecated SpiderMonkey-specific JavaScript features</li>
+                        <li class="fragment">refactoring started, but stagnant for half a year now</li>
+                    </ul>
+                    <div style="width: 40%">
+                        <img src="img/passff.png" style="width: 100%"/>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>existing browser plugins:</h2>
+                <h3>browserpass</h3>
+                <div style="display:flex; justify-content: space-between; width:100%">
+                    <ul>
+                        <li>available for Chrome & Firefox</li>
+                        <li class="fragment">simple & clean, easy to review</li>
+                        <li class="fragment">not very feature-rich</li>
+                    </ul>
+                    <div style="width: 40%">
+                        <img src="img/browserpass.gif" style="width: 100%"/>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <section>
+            <section class="center">
+                <h1>Goals & Technology</h1>
+            </section>
+            <section>
+                <h2>Goals for passB:</h2>
+                <div style="display:flex; justify-content: space-between; width:100%">
+                    <ul>
+                        <li>available for Chrome, Firefox &amp; Egde (?)</li>
+                        <li>starting from a clean base</li>
+                        <li>easily extendable by writing Extensions & Strategies without cluttering the core</li>
+                        <li>using modern technology</li>
+                        <li>tested code</li>
+                        <li>runs on Windows, too</li>
+                    </ul>
+                    <div style="width: 40%">
+                        <img src="img/passB.png" style="width: 100%"/>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>Chosen Technology:</h2>
+                <ul>
+                    <li>Typescript</li>
+                    <li>React with MaterialUI</li>
+                    <li>Redux with Immutable.js</li>
+                    <li>Dependency Injection with inversify.js</li>
+                    <li>tested with jest & enzyme</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section class="center">
+                <h1>Implementing a WebExtension &amp; pitfalls</h1>
+            </section>
+            <section>
+                <h2>Getting started with a WebExtension & Typescript</h2>
+                <pre><code data-trim class="bash">
+                    $ npm install -g yo
+                    $ npm install -g generator-webext-typescript
+                    $ mkdir extension
+                    $ cd extension
+                    $ yo webext-typescript myExtensionName myExtension@example.com http://example.com
+                </code></pre>
+                run it with
+                <pre><code data-trim class="bash">
+                    $ npm run watch &
+                    $ npm run firefox:start
+                </code></pre>
+            </section>
+            <section>
+                <h2>What you need to know about a WebExtension:</h2>
+                <ul>
+                    <li>WebExtensions cannot directly execute software on your host machine, but the can call a <em>Host
+                        Application</em></li>
+                    <li class="fragment">You're not executing code on <strong>one page</strong></li>
+                    <li class="fragment">You're executing code on <strong>many pages</strong></li>
+                    <li class="fragment">Some of these pages need to share state & communicate with each other</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Host Applications</h2>
+                <ul>
+                    <li>have to be installed manually</li>
+                    <li class="fragment">the host application's <em>manifest.json</em> has to specify exactly which
+                        extension is allowed to call it
+                    </li>
+                    <li class="fragment">communicate with the extension using SDTIN/STDOUT</li>
+                    <li class="fragment">see https://github.com/passB/nodeHostApp as an example</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Contexts in a WebExtension</h2>
+                <ul>
+                    <li class="fragment">Background page (always active)</li>
+                    <li class="fragment">Options page</li>
+                    <li class="fragment">Popup</li>
+                    <li class="fragment">Code to be eval'ed in an active tab</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Interaction between Contexts</h2>
+                <ul>
+                    <li class="fragment">Messaging:<br/><code>browser.runtime.sendMessage</code> &amp; <code>browser.runtime.onMessage</code>
+                    </li>
+                    <li class="fragment">Shared storage:<br/><code>browser.storage.local</code> (&amp; optionally <code>browser.storage.onChanged</code>)
+                    </li>
+                    <li class="fragment">Code injection:<br/><code>browser.tabs.executeScript</code></li>
+                </ul>
+            </section>
+            <section>
+                <h2>Sharing Redux State between Contexts</h2>
+                <ul>
+                    <li class="fragment"><em>redux-persist</em> persists the current State to LocalStorage</li>
+                    <li class="fragment">every new context hydrates with the last persisted State</li>
+                    <li class="fragment">dispatched Actions are synchronized between all active Contexts and applied
+                        synchronously using a custom Middleware
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Executing Code in other Contexts</h2>
+                <p>Decorators were added to allow Singleton-Classes to call methods in other Contexts when required</p>
+                <pre class="fragment"><code data-trim class="typescript">
+@AsynchronousCallable()
+export class Example extends Extension&lt;Options&gt; {
+  @executeInCorrectContext(executionContext.background)
+  private async getANumber(): Promise&lt;number&gt; {
+    // this always executes in the "Background page" Context
+    return 5;
+  }
+}
+                </code></pre>
+                <pre class="fragment"><code data-trim class="typescript">
+setExecutionContext(executionContext.popup);
+// calls to the Background page and
+// returns a Promise that will resolve to 5
+exampleInstance.getANumber();
+                </code></pre>
+            </section>
+        </section>
+        <section>
+            <section class="center">
+                <h1>How you can contribute</h1>
+            </section>
+            <section>
+                <h2>How you can contribute</h2>
+                <ul>
+                    <li>Write an Extension (for example, a Copy to Clipboard button, an OTP integration or something
+                        like that)
+                    </li>
+                    <li>Write a Strategy
+                        <ul>
+                            <li>A FileFormat</li>
+                            <li>A Filler</li>
+                            <li>A Matcher</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section class="center">
+                <h1>Example Extension</h1>
+                <h2>A "Copy to Clipboard" button</h2>
+            </section>
+            <section>
+                <p>copy/paste some boilerplate from another extension</p>
+                <em>Extensions/ClipboardExtension.ts</em>
+                <pre><code data-trim class="typescript">
+interface Options {
+}
+
+const COPY_ACTION = 'copy';
+
+@injectable()
+export class ClipboardExtension extends Extension&lt;Options&gt; {
+  // would register routes with React-DOM-Router
+  public readonly routes: RouteProps[] = [];
+  // actions provided by this extension
+  public readonly actions: string[] = [COPY_ACTION];
+  // React Component to be used in the Options Dialog
+  public readonly OptionsPanel?: OptionsPanelType&lt;Options&gt; = void 0;
+
+  @lazyInject(Symbols.PassB)
+  private passB: Interfaces.PassB;
+
+  @lazyInject(Symbols.PassCli)
+  private passCli: Interfaces.PassCli;
+}
+                </code></pre>
+            </section>
+            <section>
+                <p>register Actions with Menu Entries</p>
+                <pre><code data-trim class="typescript">
+export class ClipboardExtension extends Extension&lt;Options&gt; {
+  public async initializeList(): Promise&lt;void&gt; {
+    this.setEntries(
+      // execute `pass list`
+      (await this.passCli.list())
+        // filter for non-root entries non-folders
+        .filter((fullPath: string) =&gt; fullPath !== '' && !fullPath.startsWith('/'))
+        // associate the "Copy" action with every file entry
+        .map((fullPath: string) =&gt; ({fullPath, action: COPY_ACTION})),
+    );
+  }
+}
+                </code></pre>
+            </section>
+            <section>
+                <p>If the Action is clicked on, copy the password to the Clipboard</p>
+                <pre><code data-trim class="typescript">
+@AsynchronousCallable()
+export class ClipboardExtension extends Extension&lt;Options&gt; {
+  public executeAction(action: string, entry: string): void {
+    if (action === COPY_ACTION) {
+      this.executeCopyAction(entry);
+      window.close();
+    }
+  }
+  @executeInCorrectContext(executionContext.background)
+  private async executeCopyAction(entry: string): Promise<{}> {
+    // call `pass show $entry` on the command line
+    const entryContents = await this.passCli.show(entry);
+    // extract password from returned contents
+    const password = this.passB.getFileFormat().getPassword(entryContents, entry);
+    copyToClipBoard(password);
+  }
+}
+                </code></pre>
+            </section>
+            <section>
+                <p>
+                    Just kidding.... Firefox allows only active tabs to interact with the Clipboard. And we've already
+                    closed the Popup.
+                </p>
+                <p>
+                    So we need to execute this code in a currently open tab.
+                </p>
+                <pre><code data-trim class="typescript">
+function writeToClipboard(contents: string): void {
+  const input = document.createElement('input');
+  document.body.appendChild(input);
+  input.value = contents;
+  input.select();
+  document.execCommand('copy');
+  input.blur();
+  document.removeChild(input);
+}
+                </code></pre>
+            </section>
+            <section>
+                <p>
+                    With that method defined, we can inject it into the current tab.
+                </p>
+                <pre><code data-trim class="typescript">
+export class ClipboardExtension extends Extension&lt;Options&gt; {
+  @executeInCorrectContext(executionContext.background)
+  private async executeCopyAction(entry: string): Promise&lt;{}&gt; {
+    // as before
+
+    // get the currently opened tab
+    const currentTab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
+    // stringify the writeToClipBoard function
+    const code = `(
+      ${writeToClipboard.toString()}
+    ).apply(null, JSON.parse(${JSON.stringify(JSON.stringify([password]))}));
+    `;
+    // execute it in the currently opened tab
+    return browser.tabs.executeScript(currentTab.id, {code});
+  }
+}
+                </code></pre>
+            </section>
+            <section>
+                <p>Register it with the Dependency Injection Container</p>
+                <em>Container.ts</em>
+                <pre><code data-trim class="typescript">
+import {ClipboardExtension} from 'Extensions/ClipboardExtension';
+container.bind&lt;Interfaces.Extension&lt;{}&gt;&gt;(Symbols.Extension).to(ClipboardExtension);
+                </code></pre>
+                <div class="fragment">
+                    <p>Request "clipboardWrite" permission for passB</p>
+                    <em>manifest.json</em>
+                    <pre><code data-trim class="typescript">
+{
+// [...]
+"permissions": ["[...]", "clipboardWrite"],
+}
+                </code></pre>
+                </div>
+            </section>
+            <section>
+                <h2>Recap</h2>
+                <ul>
+                    <li class="fragment">Registered Action "Copy" with the Menu Entries</li>
+                    <li class="fragment">On Action "Copy",
+                        <ul>
+                            <li class="fragment">called for <code>executeCopyAction</code> in the background</li>
+                            <li class="fragment">closed the popup</li>
+                            <li class="fragment">in the background, executed <code>pass show $entry</code> using the
+                                HostApplication
+                            </li>
+                            <li class="fragment">injected a function into the currently open tab</li>
+                            <li class="fragment">finally copied the password into the Clipboard</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="fragment">The code for this extension can be found at <a href="https://github.com/phryneas/passB/tree/example-extension">https://github.com/phryneas/passB/tree/example-extension</a></p>
+            </section>
+        </section>
+        <section>
+            <h1>That's it.</h1>
+        </section>
+    </div>
+</div>
+
+<script src="node_modules/reveal.js/lib/js/head.min.js"></script>
+<script src="node_modules/reveal.js/js/reveal.js"></script>
+
+<script>
+  // More info about config & dependencies:
+  // - https://github.com/hakimel/reveal.js#configuration
+  // - https://github.com/hakimel/reveal.js#dependencies
+  Reveal.initialize({
+    history: true,
+    center: false,
+    dependencies: [
+      {src: 'node_modules/reveal.js/plugin/markdown/marked.js'},
+      {src: 'node_modules/reveal.js/plugin/markdown/markdown.js'},
+      {src: 'node_modules/reveal.js/plugin/notes/notes.js', async: true},
+      {
+        src: 'node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () {
+        hljs.initHighlightingOnLoad();
+      }
+      }
+    ]
+  });
+</script>
+</body>
+</html>

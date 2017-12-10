@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "start": "http-server",
+    "sass": "node-sass -w -o css css"
+  },
+  "dependencies": {
+    "reveal.js": "^3.6.0"
+  },
+  "devDependencies": {
+    "http-server": "^0.10.0",
+    "node-sass": "^4.7.2"
+  },
+  "name": "passb_talk",
+  "version": "1.0.0",
+  "main": "index.html",
+  "author": "",
+  "license": "MIT",
+  "description": ""
+}
