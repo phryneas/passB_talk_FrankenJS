@@ -71,18 +71,18 @@
                 <h2>password-store (pass)</h2>
                 <h3>"the standard unix password manager"</h3>
                 <ul>
-                    <li>written in bash</li>
-                    <li>password entries are just encrypted plaintext files in a normal directory structure</li>
-                    <li>each entry is encrypted using <strong>GPG</strong> against one or more keys</li>
-                    <li>keys can be specified on a per-folder basis for collaboration</li>
-                    <li>synchronization using one or more <strong>git</strong> repositories</li>
-                    <li>support for extensions</li>
+                    <li class="fragment">written in bash</li>
+                    <li class="fragment">password entries are just encrypted plaintext files in a normal directory structure</li>
+                    <li class="fragment">each entry is encrypted using <strong>GPG</strong> against one or more keys</li>
+                    <li class="fragment">keys can be specified on a per-folder basis for collaboration</li>
+                    <li class="fragment">synchronization using one or more <strong>git</strong> repositories</li>
+                    <li class="fragment">support for extensions</li>
                 </ul>
             </section>
             <section>
                 <h2>password-store (pass)</h2>
                 <h3>usage</h3>
-                <pre><code data-trim class="bash">
+                <pre class="fragment"><code data-trim class="bash">
                     zx2c4@laptop ~ $ pass
                     Password Store
                     ├── Business
@@ -96,11 +96,11 @@
                     ├── freebox
                     └── mobilephone
                         </code></pre>
-                <pre><code data-trim class="bash">
+                <pre class="fragment"><code data-trim class="bash">
                     zx2c4@laptop ~ $ pass Email/zx2c4.com
                     sup3rh4x3rizmynam3
                         </code></pre>
-                <pre><code data-trim class="bash">
+                <pre class="fragment"><code data-trim class="bash">
                     zx2c4@laptop ~ $ pass generate Email/jasondonenfeld.com 15
                     The generated password to Email/jasondonenfeld.com is:
                     $(-QF&Q=IN2nFBx
@@ -127,7 +127,7 @@
                 <h3>browserpass</h3>
                 <div style="display:flex; justify-content: space-between; width:100%">
                     <ul>
-                        <li>available for Chrome & Firefox</li>
+                        <li class="fragment">available for Chrome & Firefox</li>
                         <li class="fragment">simple & clean, easy to review</li>
                         <li class="fragment">not very feature-rich</li>
                     </ul>
@@ -145,12 +145,12 @@
                 <h2>Goals for passB:</h2>
                 <div style="display:flex; justify-content: space-between; width:100%">
                     <ul>
-                        <li>available for Chrome, Firefox &amp; Egde (?)</li>
-                        <li>starting from a clean base</li>
-                        <li>easily extendable by writing Extensions & Strategies without cluttering the core</li>
-                        <li>using modern technology</li>
-                        <li>tested code</li>
-                        <li>runs on Windows, too</li>
+                        <li class="fragment">available for Chrome, Firefox &amp; Egde (?)</li>
+                        <li class="fragment">starting from a clean base</li>
+                        <li class="fragment">easily extendable by writing Extensions & Strategies without cluttering the core</li>
+                        <li class="fragment">using modern technology</li>
+                        <li class="fragment">tested code</li>
+                        <li class="fragment">runs on Windows, too</li>
                     </ul>
                     <div style="width: 40%">
                         <img src="./img/passB.png" style="width: 100%"/>
@@ -160,11 +160,11 @@
             <section>
                 <h2>Chosen Technology:</h2>
                 <ul>
-                    <li>Typescript</li>
-                    <li>React with MaterialUI</li>
-                    <li>Redux with Immutable.js</li>
-                    <li>Dependency Injection with inversify.js</li>
-                    <li>tested with jest & enzyme</li>
+                    <li class="fragment">Typescript</li>
+                    <li class="fragment">React with MaterialUI</li>
+                    <li class="fragment">Redux with Immutable.js</li>
+                    <li class="fragment">Dependency Injection with inversify.js</li>
+                    <li class="fragment">tested with jest & enzyme</li>
                 </ul>
             </section>
         </section>
@@ -174,23 +174,25 @@
             </section>
             <section>
                 <h2>Getting started with a WebExtension & Typescript</h2>
-                <pre><code data-trim class="bash">
+                <pre class="fragment"><code data-trim class="bash">
                     $ npm install -g yo
                     $ npm install -g generator-webext-typescript
                     $ mkdir extension
                     $ cd extension
                     $ yo webext-typescript myExtensionName myExtension@example.com http://example.com
                 </code></pre>
+                <div class="fragment">
                 run it with
                 <pre><code data-trim class="bash">
                     $ npm run watch &
                     $ npm run firefox:start
                 </code></pre>
+                </div>
             </section>
             <section>
                 <h2>What you need to know about a WebExtension:</h2>
                 <ul>
-                    <li>WebExtensions cannot directly execute software on your host machine, but the can call a <em>Host
+                    <li class="fragment">WebExtensions cannot directly execute software on your host machine, but the can call a <em>Host
                         Application</em></li>
                     <li class="fragment">You're not executing code on <strong>one page</strong></li>
                     <li class="fragment">You're executing code on <strong>many pages</strong></li>
@@ -200,7 +202,7 @@
             <section>
                 <h2>Host Applications</h2>
                 <ul>
-                    <li>have to be installed manually</li>
+                    <li class="fragment">have to be installed manually</li>
                     <li class="fragment">the host application's <em>manifest.json</em> has to specify exactly which
                         extension is allowed to call it
                     </li>
@@ -265,14 +267,14 @@ exampleInstance.getANumber();
             <section>
                 <h2>How you can contribute</h2>
                 <ul>
-                    <li>Write an Extension (for example, a Copy to Clipboard button, an OTP integration or something
+                    <li class="fragment">Write an Extension (for example, a Copy to Clipboard button, an OTP integration or something
                         like that)
                     </li>
-                    <li>Write a Strategy
+                    <li class="fragment">Write a Strategy
                         <ul>
-                            <li>A FileFormat</li>
-                            <li>A Filler</li>
-                            <li>A Matcher</li>
+                            <li class="fragment">A FileFormat</li>
+                            <li class="fragment">A Filler</li>
+                            <li class="fragment">A Matcher</li>
                         </ul>
                     </li>
                 </ul>
